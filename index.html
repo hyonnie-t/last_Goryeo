@@ -165,12 +165,35 @@
   .final-msg .mark{font-size:30px; margin-bottom:8px;}
   .copy-status{text-align:center; font-size:13px; color:var(--sub); min-height:18px; margin-top:6px;}
 
+  /* 어려운 한자어 — 점선 밑줄, 탭하면 하단 시트로 뜻이 뜬다.
+   * his_judge_goryeo/gongmin의 GLOSSARY/glossify_/.term-tip 패턴을 그대로 재사용(효니 피드백,
+   * 2026-09-14 — 같은 3학년 단원 다른 웹앱엔 있는데 이 웹앱에만 빠져 있었음). */
+  .term{text-decoration:underline dotted; text-decoration-color:var(--seal-gold); text-underline-offset:3px; cursor:pointer;}
+  .term-tip{
+    position:fixed; left:0; right:0; bottom:-260px; max-height:45vh; overflow-y:auto;
+    background:#241d16; color:#f2e9d5; border-top:2px solid var(--seal-gold);
+    padding:16px 18px 22px; z-index:60; transition:bottom .25s ease;
+    box-shadow:0 -8px 24px rgba(0,0,0,.25);
+  }
+  .term-tip.open{bottom:0;}
+  .term-tip-head{display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:16px; margin-bottom:8px;}
+  .term-tip-head button{
+    background:none; border:1px solid #6b5f4f; color:#f2e9d5; border-radius:14px;
+    padding:5px 13px; font-family:inherit; font-size:13px; cursor:pointer;
+  }
+  .term-tip-body{font-size:14.5px; line-height:1.7;}
+
   @media (min-width:760px){ body{font-size:17px;} }
 </style>
 </head>
 <body>
 
 <div class="preview-banner" id="previewBanner">🔍 미리보기 모드 — 제출해도 기록에 안 남아요</div>
+
+<div class="term-tip" id="termTip">
+  <div class="term-tip-head"><span id="termTipTitle"></span><button type="button" id="termTipClose">닫기</button></div>
+  <div class="term-tip-body" id="termTipBody"></div>
+</div>
 
 <div class="header">
   <div class="eyebrow">3학년 한국사 · 위화도 회군과 신진 사대부의 분화</div>
@@ -200,14 +223,14 @@
     <div class="card">
       <span class="badge-chip">화면 1 · 배경 자료</span>
       <h2>위화도 회군, 그 이후</h2>
-      <p class="sub">
+      <p class="sub" id="ctxIntro">
         고려는 명과 외교 관계를 맺었으나, 명은 고려를 속국으로 대우하며 무리한 공물을 요구했다.
         원이 지배하던 옛 쌍성총관부 지역을 직접 다스리겠다고까지 하자, 우왕과 최영은 요동을 공격하기로
         결정했다. 신진 사대부는 명과의 갈등을 외교적으로 해결하자고 주장했다. 이성계도 요동 정벌에
         반대했지만 우왕의 명령으로 군대를 이끌고 나섰다. 그러나 이성계는 압록강의 위화도에서 군대를
         돌려 개경을 장악했고, 우왕과 최영을 몰아내고 정치·군사의 실권을 잡았다(1388, 위화도 회군).
       </p>
-      <p class="sub" style="margin-top:14px; font-weight:700; color:var(--ink);">
+      <p class="sub" id="ctxDivide" style="margin-top:14px; font-weight:700; color:var(--ink);">
         이후 신진 사대부는 개혁 방법을 둘러싸고 둘로 갈라졌다.
       </p>
     </div>
@@ -268,12 +291,12 @@
 
       <div class="example-card moderate">
         <div class="e-label">온건파 예시</div>
-        <blockquote>"나는 온건파를 선택한다. 왜냐하면 왕조를 유지하면서 제도를 고치는 쪽이 더 안전하다고
+        <blockquote id="compareModerateQuote">"나는 온건파를 선택한다. 왜냐하면 왕조를 유지하면서 제도를 고치는 쪽이 더 안전하다고
         생각하기 때문이다. 이 선택의 단점은 권문세족 문제가 완전히 해결되지 않을 수 있다는 점이다."</blockquote>
       </div>
       <div class="example-card radical">
         <div class="e-label">급진파 예시</div>
-        <blockquote>"나는 급진파를 선택한다. 왜냐하면 오래된 문제는 제도만 고쳐서는 해결되지 않는다고
+        <blockquote id="compareRadicalQuote">"나는 급진파를 선택한다. 왜냐하면 오래된 문제는 제도만 고쳐서는 해결되지 않는다고
         생각하기 때문이다. 이 선택의 단점은 왕조를 바꾸는 과정에서 큰 갈등이 생긴다는 점이다."</blockquote>
       </div>
 
@@ -354,13 +377,21 @@ const CONFIG = {
 
 const FACTION_LABEL = { moderate: "온건파", radical: "급진파" };
 
-/* v2 신규: 선택 즉시 뜨는 참고자료 — 정답을 알려주는 게 아니라 배경 맥락만 주는 선.
- * 학생이 그대로 베껴 쓸 수 없게 완성 문장 형태로 두지 않고, 인물·행적 정보만 준다. */
+/* 선택 즉시 뜨는 참고자료 — 정답을 알려주는 게 아니라 배경 맥락만 주는 선.
+ * 학생이 그대로 베껴 쓸 수 없게 완성 문장(이유·단점) 형태로 두지 않고, 인물·행적 정보만 준다.
+ * v3: 인물별 구체적 행적 사례(교과서 근거)를 추가 — 문단 사이 "\n\n"은 updateRefCard()에서
+ * <br><br>로 바꿔 줄바꿈으로 보여준다. */
 const REF_CONTENT = {
-  moderate: "온건파를 대표하는 인물은 이색, 정몽주야. 위화도 회군으로 이성계가 실권을 잡은 뒤에도, " +
-    "이들은 왕조를 바꾸는 대신 고려 전기의 제도를 회복하는 방식으로 문제를 풀자고 주장했어.",
+  moderate: "온건파를 대표하는 인물은 이색, 정몽주야. 신진 사대부는 원래 하급 관리나 지방 향리 출신이 " +
+    "많았고, 성리학을 공부해 과거로 관직에 올랐어.\n\n" +
+    "정몽주는 명·일본과의 외교 문제를 직접 해결한 사람이야. 1377년 일본에 가서 왜구를 막겠다는 약속을 " +
+    "받아냈고, 1386년에는 명에 사신으로 가서 무리한 공물을 깎기도 했어.\n\n" +
+    "위화도 회군 이후에도 이들은 왕조 자체를 바꾸는 대신, 고려 전기의 제도로 돌아가 문제를 고치자고 주장했어.",
   radical: "급진파를 대표하는 인물은 정도전, 조준이야. 이들은 새 왕조를 세워야 한다고 주장했고, " +
-    "실제로 이성계와 손잡은 뒤 조세·토지 제도를 개혁해 권문세족의 경제 기반을 약화시켰어."
+    "이성계와 손잡은 뒤 실제로 개혁을 실행에 옮겼어.\n\n" +
+    "1391년 과전법을 실시해서 문란했던 토지 제도를 바로잡고, 권문세족의 경제 기반을 약화시켰어.\n\n" +
+    "정도전은 이후 『조선경국전』을 써서 나라의 통치 원칙을 제시했고, 왕이 아니라 재상이 중심이 되어 " +
+    "나라를 이끌어야 한다고 주장했어."
 };
 
 /* 비교 화면(화면 3)의 예시 문장과 동일한 텍스트 — 최종 작성 화면(화면 4)에서 반대편 예시만
@@ -377,6 +408,33 @@ const EXAMPLES = {
       "생각하기 때문이다. 이 선택의 단점은 왕조를 바꾸는 과정에서 큰 갈등이 생긴다는 점이다.\""
   }
 };
+
+/* 어려운 한자어 사전 — 탭하면 하단 시트로 뜻을 보여준다.
+ * his_judge_goryeo/gongmin의 GLOSSARY 패턴을 그대로 재사용. "쌍성총관부"·"권문세족"·"신진 사대부"는
+ * 그 두 웹앱(같은 3학년 고려 말 단원)에서 이미 쓰는 정의를 그대로 가져와 학생이 다른 차시에서 본
+ * 설명과 어긋나지 않게 했다. 단, 한 글자짜리 "명"은 다른 낱말(예: "설명") 안에서도 그대로 매치돼버려
+ * 넣지 않았다 — glossify_는 단어 경계 없이 문자열 단순 치환이라 짧은 글자일수록 오탐 위험이 크다. */
+const GLOSSARY = {
+  "쌍성총관부": "원이 철령 이북 지역에 설치해 다스리던 통치 기구.",
+  "신진 사대부": "성균관 등에서 유학을 공부하며 자라난 새로운 정치 세력. 훗날 고려 멸망과 조선 건국에 큰 역할을 한다.",
+  "권문세족": "원 간섭기에 원에 기대어 성장한 새 지배 세력. 높은 관직을 독점하고 권력을 대물림했다.",
+  "위화도": "압록강 하류에 있는 섬. 1388년 이성계가 요동 정벌을 위해 북상하다가 이곳에서 군대를 돌렸다.",
+  "요동": "중국 랴오닝성 동쪽 지역. 고려 말 명과 국경 문제로 갈등을 빚은 곳이다.",
+  "회군": "군대를 돌려 되돌아가는 것.",
+  "실권": "정치·군사를 실제로 다스릴 수 있는 권한.",
+  // v3: 참고자료 카드에 구체적 행적 사례를 추가하면서 새로 등장한 한자어.
+  "성리학": "공자·맹자의 유학을 우주 원리·인간 본성과 연결해 체계화한 학문. 신진 사대부가 공부했다.",
+  "향리": "지방에서 행정 실무를 맡아보던 하급 관리.",
+  "과전법": "1391년 실시된 토지 제도. 관리에게 토지에서 세금을 거둘 권리를 지급했다.",
+  "재상": "왕을 보좌해 나라의 정치를 총괄하는 최고 관직.",
+  "조선경국전": "정도전이 지은 책. 새 왕조가 따라야 할 통치 원칙을 제시했다."
+};
+function escapeReg_(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+const GLOSSARY_RE = new RegExp(Object.keys(GLOSSARY).sort((a,b)=>b.length-a.length).map(escapeReg_).join("|"), "g");
+function glossify_(str){
+  if (!str) return str;
+  return str.replace(GLOSSARY_RE, m => `<span class="term" data-term="${m}">${m}</span>`);
+}
 
 /* 학번(학년1+반2+번호2, 5자리)에서 반 번호만 뽑아낸다. history26 포털 parseStudentId()와 동일 규칙. */
 function parseBan_(sid){
@@ -427,7 +485,7 @@ function updateRefCard(){
   const choice = selectedW1();
   if (!choice) { refCard.className = "ref-card"; return; }
   refLabel.textContent = FACTION_LABEL[choice] + " 참고자료";
-  refText.textContent = REF_CONTENT[choice];
+  refText.innerHTML = glossify_(REF_CONTENT[choice]).replace(/\n\n/g, "<br><br>");
   refCard.className = "ref-card show " + choice;
 }
 function checkWrite1(){
@@ -460,7 +518,7 @@ document.getElementById("toWrite2Btn").addEventListener("click", ()=>{
   const opp = oppositeOf_(firstChoice);
   oppositeExampleBox.className = "example-card " + opp;
   oppositeExampleLabel.textContent = EXAMPLES[opp].label;
-  oppositeExampleText.textContent = EXAMPLES[opp].text;
+  oppositeExampleText.innerHTML = glossify_(EXAMPLES[opp].text);
 
   showScreen("screen-write2");
 });
@@ -618,6 +676,21 @@ document.getElementById("copyPadletBtn").addEventListener("click", async ()=>{
   }
 });
 
+/* ── 어려운 한자어 탭 — 하단 시트 ── */
+document.addEventListener("click", (e)=>{
+  const t = e.target.closest(".term");
+  if (!t) return;
+  const term = t.dataset.term;
+  const def = GLOSSARY[term];
+  if (!def) return;
+  document.getElementById("termTipTitle").textContent = term;
+  document.getElementById("termTipBody").textContent = def;
+  document.getElementById("termTip").classList.add("open");
+});
+document.getElementById("termTipClose").addEventListener("click", ()=>{
+  document.getElementById("termTip").classList.remove("open");
+});
+
 /* ── URL 파라미터 자동 채움 / 미리보기 모드 ──
  * 주의: 위쪽 const(studentIdEl 등)를 참조하므로, 반드시 그 선언과 이벤트 바인딩이
  * 모두 끝난 뒤(스크립트 맨 아래)에 호출해야 함. TDZ 에러로 전체가 멈추는 걸 방지. */
@@ -636,6 +709,16 @@ function init(){
     if (!name) studentNameEl.value = "교사미리보기";
     checkStart();
   }
+
+  // 배경 자료·비교 화면의 고정 문구는 화면에 이미 평문으로 박혀 있으므로, 그 텍스트를 그대로
+  // glossify_에 통과시켜 한자어에 .term 밑줄을 입힌다(사용자 입력이 아니라 이 파일이 직접 쓴
+  // 문구라 별도 이스케이프 없이 innerHTML에 그대로 써도 안전함).
+  ["ctxIntro", "ctxDivide"].forEach(id=>{
+    const el = document.getElementById(id);
+    el.innerHTML = glossify_(el.textContent);
+  });
+  document.getElementById("compareModerateQuote").innerHTML = glossify_(EXAMPLES.moderate.text);
+  document.getElementById("compareRadicalQuote").innerHTML = glossify_(EXAMPLES.radical.text);
 }
 
 /* ── 진입점: 모든 선언·바인딩이 끝난 뒤 마지막에 실행 ── */
