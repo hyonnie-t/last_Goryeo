@@ -65,6 +65,13 @@
     border-radius:10px; padding:24px 20px; margin-bottom:16px;
     box-shadow:0 1px 2px rgba(43,36,32,0.05), 0 10px 24px rgba(43,36,32,0.06);
   }
+
+  /* 배경 자료 화면 최상단 배너(교사 제공 이미지) — 전체 폭 반응형, 카드와 같은 반경·그림자 톤 */
+  .context-banner{
+    display:block; width:100%; height:auto; border-radius:10px; margin-bottom:16px;
+    border:1px solid var(--rule);
+    box-shadow:0 1px 2px rgba(43,36,32,0.05), 0 10px 24px rgba(43,36,32,0.06);
+  }
   .badge-chip{
     display:inline-block; color:var(--seal-gold);
     font-size:12px; font-weight:800; letter-spacing:1.4px;
@@ -220,6 +227,8 @@
 
   <!-- 화면 1: 배경 자료 -->
   <div class="screen" id="screen-context">
+    <img class="context-banner" src="images/context-banner.jpg"
+      alt="역사 속 인물 되어보기 — 고려 말 신진사대부의 분화. 왼쪽은 급진파(정도전·조준 등)가 폐허가 된 절 앞에서 '불교의 폐단을 과감히 혁파하고 새 나라를 세워야 합니다'라고 주장하는 모습, 오른쪽은 온건파(이색·정몽주 등)가 서재에서 '고려의 기틀을 유지하며 천천히 개혁해 나가야 합니다'라고 주장하는 모습을 대비시킨 삽화.">
     <div class="card">
       <span class="badge-chip">화면 1 · 배경 자료</span>
       <h2>위화도 회군, 그 이후</h2>
