@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>고려를 개혁하는 두 가지 길</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --paper:#EAE3D3;
+    --page:#FBF8EF;
+    --ink:#2B2420;
+    --sub:#6b5f4f;
+    --rule:#d9cfb8;
+    --moderate:#3A5A78;
+    --moderate-pale:#e7edf1;
+    --radical:#7A2E2E;
+    --radical-pale:#f2e6e2;
+    --seal-gold:#B8863B;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, #f6f1e2 0%, var(--paper) 55%, #ddd2b3 100%) fixed;
+    color:var(--ink);
+    font-size:16.5px;
+    line-height:1.7;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .serif{font-family:"Noto Serif KR",serif;}
+
+  .preview-banner{
+    background:#1f1a14; color:#f4ece0; text-align:center;
+    font-size:12.5px; font-weight:700; letter-spacing:.3px;
+    padding:9px; position:sticky; top:0; z-index:20; display:none;
+  }
+
+  .header{
+    background:#241d16;
+    color:#f2e9d5; padding:28px 20px 22px; text-align:center;
+    border-bottom:3px solid var(--seal-gold);
+  }
+  .header .eyebrow{font-size:12px; font-weight:700; letter-spacing:1.6px; color:#d8b96f; opacity:.9;}
+  .header .header-rule{width:34px; height:1px; background:var(--seal-gold); margin:14px auto; opacity:.8;}
+  .header h1{margin:0 0 8px; font-size:21px; font-weight:700; font-family:"Noto Serif KR",serif; line-height:1.45;}
+  .header p{margin:0; font-size:13.5px; font-style:italic; color:#c9baa0; opacity:.9;}
+
+  .wrap{max-width:660px; margin:0 auto; padding:20px 16px 90px;}
+  .screen{display:none;}
+  .screen.active{display:block; animation:fadeUp .35s ease;}
+  @keyframes fadeUp{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .card{
+    background:var(--page); border:1px solid var(--rule);
+    border-radius:10px; padding:24px 20px; margin-bottom:16px;
+    box-shadow:0 1px 2px rgba(43,36,32,0.05), 0 10px 24px rgba(43,36,32,0.06);
+  }
+  .badge-chip{
+    display:inline-block; color:var(--seal-gold);
+    font-size:12px; font-weight:800; letter-spacing:1.4px;
+    padding:0 0 7px; margin-bottom:14px; border-bottom:1px solid var(--seal-gold);
+  }
+  h2{font-size:19px; margin:0 0 10px; font-weight:700; font-family:"Noto Serif KR",serif; line-height:1.5;}
+  p{margin:0 0 10px;}
+  .sub{color:var(--sub); font-size:14px; line-height:1.65;}
+
+  label{display:block; font-weight:700; color:var(--sub); font-size:13px; margin:14px 0 6px;}
+  input[type=text]{
+    width:100%; padding:14px 15px; font-size:16.5px; font-family:inherit;
+    border:1px solid var(--rule); border-radius:8px; background:var(--page); min-height:48px;
+  }
+  input:focus{outline:none; border-color:var(--moderate); box-shadow:0 0 0 3px rgba(58,90,120,0.12);}
+  textarea{
+    width:100%; min-height:120px; padding:14px 15px; font-size:16px;
+    border:1px solid var(--rule); border-radius:8px; background:var(--page);
+    resize:vertical; font-family:inherit; line-height:1.7;
+  }
+  textarea:focus{outline:none; border-color:var(--moderate); box-shadow:0 0 0 3px rgba(58,90,120,0.12);}
+  textarea[readonly]{background:#efe9d9; color:#4a4030;}
+
+  .btn{
+    display:block; width:100%; padding:15px 20px; font-size:16px; font-weight:700;
+    border:none; border-radius:8px; cursor:pointer; min-height:50px; margin-top:14px;
+    transition:transform .1s ease; font-family:inherit;
+  }
+  .btn:active{transform:scale(0.98);}
+  .btn-primary{background:var(--moderate); color:#f6f3ec; box-shadow:0 3px 10px rgba(58,90,120,0.28);}
+  .btn-primary:disabled{background:#c9c2b3; color:#fff; cursor:not-allowed; box-shadow:none;}
+  .btn-outline{background:transparent; color:var(--moderate); border:1.5px solid var(--moderate);}
+  .btn-seal{background:var(--seal-gold); color:#241d16; box-shadow:0 3px 10px rgba(184,134,59,0.3); text-align:center; text-decoration:none; display:block;}
+
+  .hint-toggle{
+    display:inline-flex; align-items:center; gap:6px;
+    background:none; border:none; border-bottom:1px dashed var(--moderate); color:var(--moderate);
+    font-size:13px; font-weight:700; padding:8px 0 6px; cursor:pointer; margin:6px 0 0; font-family:inherit;
+  }
+  .hint-box{
+    display:none; background:var(--moderate-pale); border-radius:0 8px 8px 0; border-left:3px solid var(--moderate);
+    padding:13px 15px; font-size:13.5px; font-style:italic; color:var(--sub); margin-top:8px; line-height:1.7;
+  }
+  .hint-box.open{display:block;}
+
+  .step-divider{border:none; border-top:1px dashed var(--rule); margin:22px 0 20px;}
+
+  .option-list{display:flex; flex-direction:column; gap:10px; margin:10px 0 4px;}
+  .option-card{
+    display:flex; align-items:flex-start; gap:12px;
+    border:1.5px solid var(--rule); border-radius:8px; background:var(--page);
+    padding:14px 15px; cursor:pointer; min-height:44px;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .option-card input[type=radio]{margin-top:3px; width:18px; height:18px; accent-color:var(--moderate); flex-shrink:0;}
+  .option-card span{font-size:15.5px; line-height:1.55;}
+  .option-card.selected{border-color:var(--moderate); background:var(--moderate-pale);}
+  .option-card.radical.selected{border-color:var(--radical); background:var(--radical-pale);}
+  .option-card.radical input[type=radio]{accent-color:var(--radical);}
+
+  /* 배경 자료 화면의 온건파/급진파 요약 카드 */
+  .faction-card{
+    border-radius:10px; padding:16px 17px; margin-bottom:12px; border:1.5px solid var(--rule);
+  }
+  .faction-card.moderate{background:var(--moderate-pale); border-color:var(--moderate);}
+  .faction-card.radical{background:var(--radical-pale); border-color:var(--radical);}
+  .faction-card .f-name{font-weight:800; font-size:15.5px; margin-bottom:4px;}
+  .faction-card.moderate .f-name{color:var(--moderate);}
+  .faction-card.radical .f-name{color:var(--radical);}
+  .faction-card .f-people{font-size:12.5px; color:var(--sub); margin-bottom:8px;}
+  .faction-card .f-position{font-size:14.5px; line-height:1.6;}
+
+  /* 비교 화면 예시 문장 카드 */
+  .example-card{
+    border-radius:10px; padding:15px 16px; margin-bottom:12px; border:1.5px dashed var(--rule);
+    background:var(--page); font-size:14.5px; line-height:1.7;
+  }
+  .example-card .e-label{font-weight:800; font-size:12.5px; letter-spacing:.4px; margin-bottom:6px;}
+  .example-card.moderate .e-label{color:var(--moderate);}
+  .example-card.radical .e-label{color:var(--radical);}
+  .example-card blockquote{margin:0; padding-left:10px; border-left:2px solid var(--rule); color:var(--ink);}
+
+  .final-msg{text-align:center;}
+  .final-msg .mark{font-size:30px; margin-bottom:8px;}
+  .copy-status{text-align:center; font-size:13px; color:var(--sub); min-height:18px; margin-top:6px;}
+
+  @media (min-width:760px){ body{font-size:17px;} }
+</style>
+</head>
+<body>
+
+<div class="preview-banner" id="previewBanner">🔍 미리보기 모드 — 제출해도 기록에 안 남아요</div>
+
+<div class="header">
+  <div class="eyebrow">3학년 한국사 · 위화도 회군과 신진 사대부의 분화</div>
+  <div class="header-rule"></div>
+  <h1 class="serif">고려를 개혁하는 두 가지 길</h1>
+  <p>어느 쪽이 더 설득력 있을까?</p>
+</div>
+
+<div class="wrap">
+
+  <!-- 화면 0: 로그인 확인 -->
+  <div class="screen active" id="screen-start">
+    <div class="card">
+      <span class="badge-chip">시작하기</span>
+      <h2>먼저 정보를 확인해줘</h2>
+      <p class="sub">포털에서 넘어온 정보가 맞는지 확인하고 시작해줘.</p>
+      <label>학번</label>
+      <input type="text" id="studentId" inputmode="numeric" maxlength="5" placeholder="예: 30512">
+      <label>이름</label>
+      <input type="text" id="studentName" placeholder="이름을 입력하세요">
+      <button class="btn btn-primary" id="startBtn" disabled>시작하기</button>
+    </div>
+  </div>
+
+  <!-- 화면 1: 배경 자료 -->
+  <div class="screen" id="screen-context">
+    <div class="card">
+      <span class="badge-chip">화면 1 · 배경 자료</span>
+      <h2>위화도 회군, 그 이후</h2>
+      <p class="sub">
+        고려는 명과 외교 관계를 맺었으나, 명은 고려를 속국으로 대우하며 무리한 공물을 요구했다.
+        원이 지배하던 옛 쌍성총관부 지역을 직접 다스리겠다고까지 하자, 우왕과 최영은 요동을 공격하기로
+        결정했다. 신진 사대부는 명과의 갈등을 외교적으로 해결하자고 주장했다. 이성계도 요동 정벌에
+        반대했지만 우왕의 명령으로 군대를 이끌고 나섰다. 그러나 이성계는 압록강의 위화도에서 군대를
+        돌려 개경을 장악했고, 우왕과 최영을 몰아내고 정치·군사의 실권을 잡았다(1388, 위화도 회군).
+      </p>
+      <p class="sub" style="margin-top:14px; font-weight:700; color:var(--ink);">
+        이후 신진 사대부는 개혁 방법을 둘러싸고 둘로 갈라졌다.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="faction-card moderate">
+        <div class="f-name">온건파</div>
+        <div class="f-people">인물: 이색, 정몽주</div>
+        <div class="f-position">고려 전기의 제도를 회복하는 방식으로 사회 문제를 해결하자.</div>
+      </div>
+      <div class="faction-card radical">
+        <div class="f-name">급진파</div>
+        <div class="f-people">인물: 정도전, 조준</div>
+        <div class="f-position">새 왕조를 세워야 한다.</div>
+      </div>
+      <button class="btn btn-primary" id="toWrite1Btn">1차 작성하러 가기</button>
+    </div>
+  </div>
+
+  <!-- 화면 2: 1차 작성 -->
+  <div class="screen" id="screen-write1">
+    <div class="card">
+      <span class="badge-chip">화면 2 · 1차 작성</span>
+      <h2>너는 어느 쪽을 선택할래?</h2>
+      <p class="sub">먼저 네 생각대로 골라보고, 이유와 이 선택의 단점까지 써봐. 예시는 다음 화면에서 보여줄게.</p>
+
+      <div class="option-list" id="w1Options">
+        <label class="option-card moderate"><input type="radio" name="w1choice" value="moderate"><span>온건파 — 제도를 고쳐서 고려를 유지한다</span></label>
+        <label class="option-card radical"><input type="radio" name="w1choice" value="radical"><span>급진파 — 새 왕조를 세운다</span></label>
+      </div>
+
+      <label>나는 이 입장을 선택한다. 왜냐하면 ___이기 때문이다. 이 선택의 단점은 ___이라고 생각한다.</label>
+      <textarea id="w1ReasonTxt" placeholder="예: 왜냐하면 ___이기 때문이다. 이 선택의 단점은 ___이라고 생각한다."></textarea>
+
+      <button type="button" class="hint-toggle" id="hintToggle">💡 막막하면 힌트 보기</button>
+      <div class="hint-box" id="hintBox">
+        온건파는 무엇을 유지하려고 했을까? 급진파는 무엇이 근본적으로 문제라고 봤을까?
+      </div>
+
+      <button class="btn btn-primary" id="toCompareBtn" disabled>다음: 예시와 비교하기</button>
+    </div>
+  </div>
+
+  <!-- 화면 3: 비교 화면 -->
+  <div class="screen" id="screen-compare">
+    <div class="card">
+      <span class="badge-chip">화면 3 · 비교해보기</span>
+      <h2>다른 친구라면 이렇게 썼을 수도 있어</h2>
+      <p class="sub">아래 두 문장은 정답이 아니라, 서로 다른 입장에서 쓴 <b>비교 대상</b>이야. 네가 고르지 않은 쪽도 한번 읽어봐.</p>
+
+      <div class="example-card moderate">
+        <div class="e-label">온건파 예시</div>
+        <blockquote>"나는 온건파를 선택한다. 왜냐하면 왕조를 유지하면서 제도를 고치는 쪽이 더 안전하다고
+        생각하기 때문이다. 이 선택의 단점은 권문세족 문제가 완전히 해결되지 않을 수 있다는 점이다."</blockquote>
+      </div>
+      <div class="example-card radical">
+        <div class="e-label">급진파 예시</div>
+        <blockquote>"나는 급진파를 선택한다. 왜냐하면 오래된 문제는 제도만 고쳐서는 해결되지 않는다고
+        생각하기 때문이다. 이 선택의 단점은 왕조를 바꾸는 과정에서 큰 갈등이 생긴다는 점이다."</blockquote>
+      </div>
+
+      <button class="btn btn-primary" id="toWrite2Btn">최종 작성하러 가기</button>
+    </div>
+  </div>
+
+  <!-- 화면 4: 최종 작성 -->
+  <div class="screen" id="screen-write2">
+    <div class="card">
+      <span class="badge-chip">화면 4 · 최종 작성</span>
+      <h2>예시와 비교해보니, 네 생각은?</h2>
+      <p class="sub">방금 본 두 예시와 비교해서, 처음 입장을 그대로 유지할지 바꿀지 정해줘.</p>
+
+      <div class="option-list" id="w2Options">
+        <label class="option-card"><input type="radio" name="w2choice" value="keep"><span>입장 유지 — 처음 선택을 그대로 지킨다</span></label>
+        <label class="option-card"><input type="radio" name="w2choice" value="change"><span>입장 수정 — 반대쪽으로 바꾼다</span></label>
+      </div>
+
+      <label>예시와 비교해보니, 나는 [입장 유지 / 입장 수정]한다. 이유는 ___이다.</label>
+      <textarea id="w2ReasonTxt" placeholder="예: 이유는 ___이다."></textarea>
+
+      <button class="btn btn-primary" id="submitBtn" disabled>제출하기</button>
+    </div>
+  </div>
+
+  <!-- 화면 5: 제출 완료 -->
+  <div class="screen" id="screen-done">
+    <div class="card final-msg">
+      <div class="mark">✅</div>
+      <div style="font-weight:800; font-size:16px;">제출 완료</div>
+      <div class="sub" style="margin-top:6px;">오늘 활동 여기까지! 선생님이 네 글을 확인할게.</div>
+    </div>
+
+    <div class="card" id="padletCard" style="display:none;">
+      <span class="badge-chip">패들렛에 옮겨 쓰기</span>
+      <h2>이 내용을 복사해서 패들렛에 붙여넣어줘</h2>
+      <textarea id="padletText" readonly style="min-height:200px;"></textarea>
+      <button class="btn btn-outline" id="copyPadletBtn">📋 패들렛에 복사하기</button>
+      <a class="btn btn-seal" id="openPadletBtn" href="#" target="_blank" rel="noopener" style="display:none;">🔗 패들렛으로 이동</a>
+      <p class="copy-status" id="padletStatus"></p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════
+ * CONFIG
+ * ════════════════════════════════════════════════════════ */
+const CONFIG = {
+  SHEET_WEBAPP_URL: "https://script.google.com/macros/s/AKfycbyXSjCfWY_HiZFqW_OBR-FQDoIfF1z_STqyKWUI31MacHeY3u7hbirFSFDvW-5yuUHaJQ/exec",
+  // TODO(효니): 커리큘럼 시트에 이 문자열 그대로 activity id로 등록할 것.
+  // 3학년 5차시(역사법정 다다음 차시) — 위화도 회군 이후 신진 사대부 분화.
+  GAME_NAME: "5차시_위화도회군_사대부분화글쓰기",
+  // 3학년 5~8반 패들렛 — his_judge_goryeo/gongmin과 같은 반별 링크를 그대로 재사용.
+  PADLET_URL_BY_BAN: {
+    5: "https://padlet.com/dy_sch03/2026-2-3-5-cewq8vec8p3ew2yn",
+    6: "https://padlet.com/dy_sch03/2026-2-3-6-2xngg3v8pstkvld9",
+    7: "https://padlet.com/dy_sch03/2026-2-3-7-8ssvnriy75f7xwxs",
+    8: "https://padlet.com/dy_sch03/2026-2-3-8-gsrz2i3ca863675l"
+  }
+};
+
+const FACTION_LABEL = { moderate: "온건파", radical: "급진파" };
+
+/* 학번(학년1+반2+번호2, 5자리)에서 반 번호만 뽑아낸다. history26 포털 parseStudentId()와 동일 규칙. */
+function parseBan_(sid){
+  const digits = String(sid || "").trim();
+  if (!/^\d{5}$/.test(digits)) return null;
+  return parseInt(digits.slice(1, 3), 10);
+}
+
+/* ── 화면 전환 ── */
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* ── 화면 0: 입력 검증 ── */
+const studentIdEl = document.getElementById("studentId");
+const studentNameEl = document.getElementById("studentName");
+const startBtn = document.getElementById("startBtn");
+
+function checkStart(){
+  startBtn.disabled = !(studentIdEl.value.trim() && studentNameEl.value.trim());
+}
+[studentIdEl, studentNameEl].forEach(el=>el.addEventListener("input", checkStart));
+startBtn.addEventListener("click", ()=> showScreen("screen-context"));
+
+/* ── 화면 1 → 2 ── */
+document.getElementById("toWrite1Btn").addEventListener("click", ()=> showScreen("screen-write1"));
+
+/* ── 힌트 토글 ── */
+document.getElementById("hintToggle").addEventListener("click", ()=>{
+  document.getElementById("hintBox").classList.toggle("open");
+});
+
+/* ── 화면 2: 1차 작성 검증 ── */
+const w1OptionInputs = Array.from(document.querySelectorAll('input[name="w1choice"]'));
+const w1ReasonTxt = document.getElementById("w1ReasonTxt");
+const toCompareBtn = document.getElementById("toCompareBtn");
+
+function selectedW1(){
+  const checked = w1OptionInputs.find(el => el.checked);
+  return checked ? checked.value : null;
+}
+function checkWrite1(){
+  toCompareBtn.disabled = !(selectedW1() && w1ReasonTxt.value.trim().length >= 10);
+}
+w1OptionInputs.forEach(el=>el.addEventListener("change", ()=>{
+  w1OptionInputs.forEach(o=> o.closest(".option-card").classList.toggle("selected", o.checked));
+  checkWrite1();
+}));
+w1ReasonTxt.addEventListener("input", checkWrite1);
+toCompareBtn.addEventListener("click", ()=> showScreen("screen-compare"));
+
+/* ── 화면 3 → 4 ── */
+document.getElementById("toWrite2Btn").addEventListener("click", ()=> showScreen("screen-write2"));
+
+/* ── 화면 4: 최종 작성 검증 ── */
+const w2OptionInputs = Array.from(document.querySelectorAll('input[name="w2choice"]'));
+const w2ReasonTxt = document.getElementById("w2ReasonTxt");
+const submitBtn = document.getElementById("submitBtn");
+
+function selectedW2(){
+  const checked = w2OptionInputs.find(el => el.checked);
+  return checked ? checked.value : null;
+}
+function checkWrite2(){
+  submitBtn.disabled = !(selectedW2() && w2ReasonTxt.value.trim().length >= 8);
+}
+w2OptionInputs.forEach(el=>el.addEventListener("change", ()=>{
+  w2OptionInputs.forEach(o=> o.closest(".option-card").classList.toggle("selected", o.checked));
+  checkWrite2();
+}));
+w2ReasonTxt.addEventListener("input", checkWrite2);
+
+/* 최종 입장(온건파/급진파)은 "유지/수정" 선택으로부터 계산한다 — 유지면 1차와 같은 쪽,
+ * 수정이면 반대쪽. 최종 화면에서 온건파/급진파를 다시 고르게 하지 않는 이유는 핸드오프
+ * 문구("입장 유지 / 입장 수정")를 그대로 따른 것. */
+function finalChoiceFrom_(firstChoice, decision){
+  if (decision === "keep") return firstChoice;
+  return firstChoice === "moderate" ? "radical" : "moderate";
+}
+
+/* ── 제출 재시도 헬퍼 — history26 포털 fetchJsonRetry_() 관례(3회·700ms 간격)와 동일.
+ * 순간적인 네트워크 문제로 fetch가 한 번 실패해도 시트 기록이 안 남는 사고를 막기 위함
+ * (webapp-builder 스킬 필수 항목). ── */
+function postWithRetry_(url, payload, triesLeft){
+  triesLeft = (triesLeft == null) ? 3 : triesLeft;
+  return fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .catch(err => {
+    if (triesLeft > 1) {
+      return new Promise(resolve => setTimeout(resolve, 700))
+        .then(() => postWithRetry_(url, payload, triesLeft - 1));
+    }
+    throw err;
+  });
+}
+
+let PREVIEW = false;
+let submitting = false;
+
+submitBtn.addEventListener("click", async ()=>{
+  if (submitting) return;
+  submitting = true;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "제출 중...";
+
+  const studentId = studentIdEl.value.trim();
+  const studentName = studentNameEl.value.trim();
+  const firstChoice = selectedW1();
+  const firstReason = w1ReasonTxt.value.trim();
+  const finalDecision = selectedW2();
+  const finalReason = w2ReasonTxt.value.trim();
+  const finalChoice = finalChoiceFrom_(firstChoice, finalDecision);
+
+  const decisionLabel = finalDecision === "keep" ? "입장 유지" : "입장 수정";
+
+  const reflection =
+    `[1차 작성 — ${FACTION_LABEL[firstChoice]}]\n${firstReason}\n\n` +
+    `[최종 작성 — ${decisionLabel} → ${FACTION_LABEL[finalChoice]}]\n${finalReason}`;
+
+  const payload = {
+    studentId: studentId,
+    studentName: studentName,
+    gameName: CONFIG.GAME_NAME,
+    choiceSummary: `1차: ${FACTION_LABEL[firstChoice]} → 최종: ${FACTION_LABEL[finalChoice]}(${decisionLabel})`,
+    diffSummary: "",
+    reflection: reflection,
+    // 1차 작성과 최종 작성을 각각 따로 저장한다(효니 확정, 2026-09-14) — 입장 변화 여부를
+    // 나중에 교사가 확인할 수 있도록 두 단계를 합치지 않고 필드를 분리해서 담는다.
+    choicesJson: JSON.stringify({
+      first_choice: firstChoice,
+      first_choice_label: FACTION_LABEL[firstChoice],
+      first_reason: firstReason,
+      final_decision: finalDecision,
+      final_decision_label: decisionLabel,
+      final_choice: finalChoice,
+      final_choice_label: FACTION_LABEL[finalChoice],
+      final_reason: finalReason
+    })
+  };
+
+  if (!PREVIEW) {
+    try{ localStorage.setItem("sadaebu_pending_submit", JSON.stringify(payload)); }catch(e){}
+
+    try{
+      const json = await postWithRetry_(CONFIG.SHEET_WEBAPP_URL, payload);
+      if (!json || json.result !== "success") throw new Error((json && json.message) || "백엔드가 저장 실패를 반환함");
+      try{ localStorage.removeItem("sadaebu_pending_submit"); }catch(e){}
+    }catch(err){
+      console.log("전송 실패(콘솔 확인용):", err);
+      submitting = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = "다시 제출하기";
+      alert("여러 번 시도했는데 계속 실패했어. 인터넷 연결을 확인하고 다시 눌러줘! (누르지 않아도 이 화면엔 네가 쓴 글이 남아있어)");
+      return;
+    }
+  } else {
+    console.log("[미리보기] 실제 전송 안 함:", payload);
+  }
+
+  const padletText =
+    `[1차 작성 — ${FACTION_LABEL[firstChoice]}]\n${firstReason}\n\n` +
+    `[최종 작성 — ${decisionLabel} → ${FACTION_LABEL[finalChoice]}]\n${finalReason}`;
+  document.getElementById("padletText").value = padletText;
+  document.getElementById("padletStatus").textContent = "";
+
+  const padletUrl = CONFIG.PADLET_URL_BY_BAN[parseBan_(studentId)];
+  const padletCard = document.getElementById("padletCard");
+  const openPadletBtn = document.getElementById("openPadletBtn");
+  if (padletUrl) {
+    padletCard.style.display = "block";
+    openPadletBtn.href = padletUrl;
+    openPadletBtn.style.display = "block";
+  } else {
+    padletCard.style.display = "none";
+  }
+
+  submitting = false;
+  showScreen("screen-done");
+});
+
+/* ── 패들렛용 복사하기 ── */
+document.getElementById("copyPadletBtn").addEventListener("click", async ()=>{
+  const box = document.getElementById("padletText");
+  const statusEl = document.getElementById("padletStatus");
+  try{
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(box.value);
+    } else {
+      box.removeAttribute("readonly");
+      box.focus();
+      box.select();
+      document.execCommand("copy");
+      box.setAttribute("readonly", "true");
+    }
+    statusEl.textContent = "✅ 복사됐어! 패들렛에 붙여넣기 해봐.";
+  }catch(err){
+    statusEl.textContent = "복사가 안 됐어. 위 글을 직접 길게 눌러서 선택 후 복사해줘.";
+    box.removeAttribute("readonly");
+    box.focus();
+    box.select();
+  }
+});
+
+/* ── URL 파라미터 자동 채움 / 미리보기 모드 ──
+ * 주의: 위쪽 const(studentIdEl 등)를 참조하므로, 반드시 그 선언과 이벤트 바인딩이
+ * 모두 끝난 뒤(스크립트 맨 아래)에 호출해야 함. TDZ 에러로 전체가 멈추는 걸 방지. */
+function init(){
+  const params = new URLSearchParams(location.search);
+  const sid = params.get("sid") || "";
+  const name = params.get("name") || "";
+  if (sid) studentIdEl.value = sid;
+  if (name) studentNameEl.value = name;
+  checkStart();
+
+  if (params.get("preview") === "1") {
+    PREVIEW = true;
+    document.getElementById("previewBanner").style.display = "block";
+    if (!sid) studentIdEl.value = "30501";
+    if (!name) studentNameEl.value = "교사미리보기";
+    checkStart();
+  }
+}
+
+/* ── 진입점: 모든 선언·바인딩이 끝난 뒤 마지막에 실행 ── */
+init();
+</script>
+
+</body>
+</html>
